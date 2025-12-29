@@ -110,7 +110,6 @@ Mobilna aplikacija komunicira sa backend servisima putem bezbednih API poziva. O
 ## Slučajevi korišćenja
 1. Praćenje i pregled zdravstvenih podataka
 
-  
     Ovde spadaju funkcionalnosti koje omogućavaju krajnjem korisniku praćenje i vizualizaciju zdravstvenih parametara. To su:
     - prikupljanje podataka sa nosivih uređaja,
     - prikaz trenutnih vrednosti,
