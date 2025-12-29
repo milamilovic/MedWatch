@@ -53,6 +53,59 @@ U okviru domena postoje sledeći ključni učesnici:
   Definisanje kontakt osoba i pragova za uzbune.
 
 ## Arhitektura sistema
+Zamišljeni softver je projektovan kao event-driven distribuirani sistem. Njegove komponente prikupljaju podatke, obrađuju događaje, skladište informacije i komuniciraju sa krajnjim korisnicima.
+
+Osnovne arhitekturalne karakteristike sistema su:
+
+- Event-driven arhitektura
+
+  Zdravstveni podaci su event-ovi koji nastaju merenjem na IoT uređajima. Ovo omogućava skalabilnost, slabu povezanost komponenti i efikasnu obradu podataka u realnom vremenu.
+
+- Asinhrona komunikacija
+
+  Većina komunikacije između komponentid se odvija asinhrono, putem message broker-a. Na taj način se smanjuje zavisnost između servisa i povećava otpornost sistema na greške.
+
+- Mikroservisna arhitektura
+
+  Sistem je podeljen na više logičkih servisa, gde svaki servis ima jasno definisanu odgovornost i može se nezavisno razvijati i skalirati.
+
+- Podrška za rad u realnom vremenu
+
+  Arhitektura sistema je takva da je kašnjenje u obradi podataka minimalno, naročito u kontekstu detekcije kritičnih zdravstvenih stanja.
+
+- Bezbednost i privatnost po dizajnu (security & privacy by design)
+
+  Arhitektura je osmišljena uzimajući u obzir činjenicu da se obrađuju zdravstveni podaci. Ona omogućava kontrolu pristupa, segmentaciju sistema i minimizaciju izloženosti osetljivih informacija.
+
+### Tehnologije i njihova uloga u sistemu
+
+1. Rust backend servisi
+
+Backend sistema je implementiran u programskom jeziku Rust. Rust smo izabrale zbog visokih performansi i niske latencije, bezbednosnih garancija na nivou memorije (memory safety) i dobre podrške za konkurentno i asinhrono programiranje. Backend je podeljen na četiri mikroservisa.
+
+2. AMQP (RabbitMQ)
+
+AMQP protokol, uz RabbitMQ kao implementaciju, koristi se za komunikaciju između IoT uređaja i sistema. Ovaj protokol je posebno pogodan za IoT okruženja zbog male potrošnje mrežnih i računarskih resursa, podrške za publish/subscribe model i tolerancije na nestabilne mrežne veze. 
+
+IoT uređaji objavljuju zdravstvene podatke na odgovarajuće AMQP redove, dok backend servis čita iz tih redova i preuzima podatke za dalju obradu.
+
+3. MQTT (Mosquitto)
+
+Mosquitto se, kao broker za MQTT protokol, koristi za real time stream podataka. Zbog toga što funkcioniše na publish/subscribe modelu je pogodan za live monitoring i grafički prikaz podataka korisniku.
+
+4. InfluxDB
+
+InfluxDB se koristi kao baza podataka za skladištenje zdravstvenih podataka zavisnih u vremenu. Razlozi za izbor ove baze su to što je optimizovana za rad sa vremenskim serijama i velikim brojem merenja, kao i podrške za agragaciju i analizu trendova kroz vreme.
+
+InfluxDB skladišti istorijske zdravstvene podatke korisnika, koji se kasnije prikazuju u mobilnoj aplikaciji.
+
+5. Servis za notifikacije
+
+Servis za notifikacije je zadužen za slanje SOS uzbuna kontakt osobama. On se integriše sa Simple Notification Service-om na AWS-u i aktivira se isključivo kada backend detektuje kritične zdravstvene vrednosti.
+
+6. Mobilna aplikacija
+
+Mobilna aplikacija komunicira sa backend servisima putem bezbednih API poziva. Ona predstavlja glavni interfejs za krajnje korisnike. Funkcionalnosti uključuju prikaz trenutnih i istorijskih zdravstvenih podataka, upravljanje pragovima za kritične vrednosti i definisanje kontakt osobe za SOS uzbune. 
 
 ## Slučajevi korišćenja
 
