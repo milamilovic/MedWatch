@@ -108,5 +108,41 @@ Servis za notifikacije je zadužen za slanje SOS uzbuna kontakt osobama. On se i
 Mobilna aplikacija komunicira sa backend servisima putem bezbednih API poziva. Ona predstavlja glavni interfejs za krajnje korisnike. Funkcionalnosti uključuju prikaz trenutnih i istorijskih zdravstvenih podataka, upravljanje pragovima za kritične vrednosti i definisanje kontakt osobe za SOS uzbune. 
 
 ## Slučajevi korišćenja
+1. Praćenje i pregled zdravstvenih podataka
+
+  
+    Ovde spadaju funkcionalnosti koje omogućavaju krajnjem korisniku praćenje i vizualizaciju zdravstvenih parametara. To su:
+    - prikupljanje podataka sa nosivih uređaja,
+    - prikaz trenutnih vrednosti,
+    - pregled istorijskih merenja i trendova kroz vreme,
+    - filtriranje i agregacija podataka po vremenskim periodima ili tipovima merenja.
+
+2. Upravljanje pragovima i SOS kontaktima
+
+    Ova grupa funkcionalnosti omogućava korisniku da definiše pravila za detekciju kritičnih stanja i dodaje osobe koje će biti obaveštene. Tu spadaju:
+    - postavljanje individualnih pragova za kritične zdravstvene vrednosti,
+    - registracija i upravljanje kontakt osobama za SOS uzbune,
+    - aktivacija i deaktivacija SOS servisa.
+
+3. Detekcija kritičnih stanja i podizanje uzbuna
+
+    Obuhvata backend procese i logiku koji omogućavaju automatsko prepoznavanje potencijalno opasnih zdravstvenih situacija i obaveštavanje kontakt osoba:
+    - kontinuirana analiza zdravstvenih podataka u realnom vremenu,
+    - podizanje uzbuna kada merenja prelaze definisane pragove,
+    - slanje SOS notifikacije kontakt osobi,
+    - logovanje kritičnih događaja radi revizije i kasnije analize.
+
+4. Upravljanje korisničkim nalogom i konfiguracijom
+
+    Ova grupa služi za administraciju korisničkih naloga i osnovnih podešavanja:
+    - registracija i autentifikacija korisnika,  
+    - promena ličnih podataka i lozinki,
+    - povezivanje nosivog uređaja.
+
+5. Notifikacije i komunikacija sa korisnikom
+
+    Ova grupa obuhvata interakciju sa korisnikom u obliku obaveštenja i vizualnih indikacija:
+    - slanje push notifikacija o kritičnim stanjima,
+    - prikaz statusa uređaja i konekcije sa sistemom u mobilnoj aplikaciji.
 
 ## Osetljivi resursi
