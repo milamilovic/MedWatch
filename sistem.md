@@ -63,7 +63,7 @@ Osnovne arhitekturalne karakteristike sistema su:
 
 - Asinhrona komunikacija
 
-  Većina komunikacije između komponentid se odvija asinhrono, putem message broker-a. Na taj način se smanjuje zavisnost između servisa i povećava otpornost sistema na greške.
+  Većina komunikacije između komponenti se odvija asinhrono, putem message broker-a. Na taj način se smanjuje zavisnost između servisa i povećava otpornost sistema na greške.
 
 - Mikroservisna arhitektura
 
@@ -85,13 +85,11 @@ Backend sistema je implementiran u programskom jeziku Rust. Rust smo izabrale zb
 
 2. AMQP (RabbitMQ)
 
-AMQP protokol, uz RabbitMQ kao implementaciju, koristi se za komunikaciju između IoT uređaja i sistema. Ovaj protokol je posebno pogodan za IoT okruženja zbog male potrošnje mrežnih i računarskih resursa, podrške za publish/subscribe model i tolerancije na nestabilne mrežne veze. 
-
-IoT uređaji objavljuju zdravstvene podatke na odgovarajuće AMQP redove, dok backend servis čita iz tih redova i preuzima podatke za dalju obradu.
+Backend servis koji prima podatke sa uređaja sortira podatke i objavljuje ih pomoću AMQP protokola na odgovarajuće RabbitMQ redove, dok ostali backend servisi čitaju iz tih redova i preuzimaju podatke za dalju obradu.
 
 3. MQTT (Mosquitto)
 
-Mosquitto se, kao broker za MQTT protokol, koristi za real time stream podataka. Zbog toga što funkcioniše na publish/subscribe modelu je pogodan za live monitoring i grafički prikaz podataka korisniku.
+Mosquitto se, kao broker za MQTT protokol, koristi za komunikaciju između IoT uređaja i sistema.
 
 4. InfluxDB
 
