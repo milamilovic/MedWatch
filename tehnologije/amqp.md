@@ -1,6 +1,11 @@
 # AMQP
 
-AMQP (Advanced Message Queue Protocol) je protokol aplikacionog nivoa orijentisan na poruke osnosno prenosi poruke u celosti a ne strimove bajtova. On je binarni protokol i oslanja se na TCP. Može da podrži autentifikaciju kroz SASL (Simple Authentication and Security Layer) i enkripciju kroz TLS/SSL (Transport Layer Security/Secure Socket Layer). Osnovna jedinica prenosa podataka je *frame*. AMQP podržava tri tipa garancije isporuke: *at-most-once* odnosno da će poruka biti isporučena jednom ili ni jednom, *at-least-once* gde će poruka biti isporučena makar jednom, kao i *exactly-once* odnosno da će podaci stići tačno jednom. AMQP nije implementiran kao API već kao žični protokol, tako da se komunikacija može odvijati između klijenata koji znaju da interpretiraju i kreiraju te bajtove koji se prenose preko mreže.
+AMQP (Advanced Message Queue Protocol) je protokol aplikacionog nivoa orijentisan na poruke osnosno prenosi poruke u celosti a ne strimove bajtova. On je binarni protokol i oslanja se na TCP. Može da podrži autentifikaciju kroz SASL (Simple Authentication and Security Layer) i enkripciju kroz TLS/SSL (Transport Layer Security/Secure Socket Layer). Osnovna jedinica prenosa podataka je *frame*. AMQP podržava tri tipa garancije isporuke: 
+- *at-most-once* odnosno da će poruka biti isporučena jednom ili ni jednom
+- *at-least-once* gde će poruka biti isporučena makar jednom
+- *exactly-once* odnosno da će podaci stići tačno jednom.
+
+AMQP nije implementiran kao API već kao žični protokol, tako da se komunikacija može odvijati između klijenata koji znaju da interpretiraju i kreiraju te bajtove koji se prenose preko mreže.
 
 <br/>
 <img width="691" height="297" alt="image" src="https://github.com/user-attachments/assets/d0677cba-7b1e-45d7-afee-59cc9997de19" />
@@ -11,7 +16,7 @@ Logička arhitektura AMQP servera je standardizovana da bi se garantovala intero
 
 ## RabbitMQ
 
-RabbitMQ je broker poruka otvorenog koda. Inicjalno implementira AMQP protokkol ali se pomoću plagina može proširiti i na STOMP i MQTT protokole. Implementiran je u Erlang programskom jeziku. Njegove ključne komponente su:
+RabbitMQ je broker poruka otvorenog koda. Inicjalno implementira AMQP protokol ali se pomoću plagina može proširiti i na STOMP i MQTT protokole. Implementiran je u Erlang programskom jeziku. Njegove ključne komponente su:
 
 - Producer - aplikacija koja šalje poruke i one se ne šalju direktno u queue već u exchange
 - Exchange - prima poruke od producera i rutira ih u queue-ove prema pravilima
