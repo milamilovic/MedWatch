@@ -1,16 +1,24 @@
 # AMQP
 
-AMQP (Advanced Message Queue Protocol) je protokol aplikacionog nivoa orijentisan na poruke. On je binarni protokol i oslanja se na TCP. Može da podrži autentifikaciju/enkripciju baziranu na SASL/TSL-u. Ovo pruža svojstvo neporecivosti porukama koje se šalju preko AMQP protokola. Osnovna jedinica prenosa podataka je *frame*. AMQP može da garantuje za podatke at-most-once, at-least-once ili exactly-once osnosno da će podaci stići jednom ili ni jednom, makar jednom ili tačno jednom. AMQP nije implementiran kao API već kao žični protokol, tako da se komunikacija može odvijati između klijenata koji znaju da interpretiraju i kreiraju te bajtove koji se prenose preko mreže.
+AMQP (Advanced Message Queue Protocol) je protokol aplikacionog nivoa orijentisan na poruke osnosno prenosi poruke u celosti a ne strimove bajtova. On je binarni protokol i oslanja se na TCP. Može da podrži autentifikaciju kroy SASL (Simple Authentication and Security Layer) i enkripciju kroz TLS/SSL (Transport Layer Security/Secure Socket Layer). Ovo pruža svojstvo neporecivosti porukama koje se šalju preko AMQP protokola. Osnovna jedinica prenosa podataka je *frame*. AMQP podržava tri tipa garancije isporuke: *at-most-once* odnosno da će poruka biti isporučena jednom ili ni jednom, *at-least-once* gde će poruka biti isporučena makar jednom, kao i *exactly-once* odnosno da će podaci stići tačno jednom. AMQP nije implementiran kao API već kao žični protokol, tako da se komunikacija može odvijati između klijenata koji znaju da interpretiraju i kreiraju te bajtove koji se prenose preko mreže.
 
 ## RabbitMQ
 
-RabbitMQ je broker poruka otvorenog koda. Inicjalno implementira AMQP protokkol ali se pomoću plagina može proširiti i na STOMP i MQTT protokole. Implementiran je u Erlang programskom jeziku i na Open Telecom Platform radnom okviru za klasterovanje.
+RabbitMQ je broker poruka otvorenog koda. Inicjalno implementira AMQP protokkol ali se pomoću plagina može proširiti i na STOMP i MQTT protokole. Implementiran je u Erlang programskom jeziku. Njegove ključne komponente su:
+
+- Producer - aplikacija koja šalje poruke i one se ne šalju direktno u queue već u exchange
+- Exchange - prima poruke od producera i rutira ih u queue-ove prema pravilima
+- Queue - bafer koji čuva poruke u FIFO redu dok consumer ne bude spreman da ih obradi
+- Binding - veza između exchange-a i queue-a sa pravilom (pattern) koje određuje koje poruke će biti rutirane u taj queue
+- Consumer - aplikacija koja prima i obrađuje poruke iz queue-a
+
 
 <img width="1872" height="867" alt="image" src="https://github.com/user-attachments/assets/5cf0113a-06e7-4a9f-8b2a-da922da5a96b" />
 
 ## Arhitektura
 
 <img width="1203" height="764" alt="image" src="https://github.com/user-attachments/assets/08cab803-8d2b-44b3-84fc-50d92ad34201" />
+
 <img width="1189" height="804" alt="image" src="https://github.com/user-attachments/assets/698d9e98-a0ab-433c-9f17-cd948945344b" />
 
 
