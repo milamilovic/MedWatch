@@ -21,7 +21,7 @@ RabbitMQ je broker poruka otvorenog koda. Inicjalno implementira AMQP protokkol 
 
 <img width="1189" height="804" alt="image" src="https://github.com/user-attachments/assets/698d9e98-a0ab-433c-9f17-cd948945344b" />
 
-
+Prva komponenta RabbitMQ servera je generički tcp soket koji služi kao ulazna/izlazna tačka za komunikaciju. Ona dalje komunicira sa Reader komponentom koja čita bajtove koji stižu sa mreže i šalje ih framing channel-u koji ih pretvara u AMQP frejmove. Channel komponenta izvršava AMQP komande, updavlja transakcijama i proverava permisije. Writer komponenta prima frejmove od channel-a i pretvara ih u bajtove za slanje preko mreže. RabbitMQ server takođe sadrži i mnesia-u što je distribuirana baza podataka u Erlang-u koja čuva definicije queue-ova i exchange-ova, naloge korisnika i njihove permisije. Poslednja komponenta servera je amqqueue tj red čekanja poruka koje još uvek nisu obrađene.  
 
 
 ## Reference
