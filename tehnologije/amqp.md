@@ -48,3 +48,5 @@ https://www.rabbitmq.com/resources/google-tech-talk-final/alexis-google-rabbitmq
 https://www.rabbitmq.com/resources/google-tech-talk-final/google
 
 https://www.rabbitmq.com/resources/specs/amqp0-9-1.pdf
+
+https://www.rabbitmq.com/tutorials/amqp-concepts
