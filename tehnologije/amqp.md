@@ -18,13 +18,13 @@ RabbitMQ je broker poruka otvorenog koda. Inicjalno implementira AMQP protokkol 
 ## Arhitektura
 
 <img width="1203" height="764" alt="image" src="https://github.com/user-attachments/assets/08cab803-8d2b-44b3-84fc-50d92ad34201" />
-
+<br/><br/>
 
 Logička arhitektura AMQP-a se sastoji iz socket layer-a koji je apstrakcija operativnog sistema za TCP/IP komunikaciju. Demultiplexer je komponenta koja razdvaja frejmove koji dolaze odnosno odvaja njihov header od stvarnog sadržaja i prosleđuje ih ka odgovarajućem channel-u. Command assembler sastavlja komande od frejmova koji dolaze i prosleđuje ih channel-u koji ih izvršava. Framer prima različite komande i pretvara ih u frejmove. Multiplexer prima frejmove, dodaje im header i sprema ih za slanje. Komponenta označena sa X je exchange koji rutira poruke, odnosno prima ih iz channel-a i prosleđuje na queue-ove.
 
-
-<img width="1189" height="804" alt="image" src="https://github.com/user-attachments/assets/698d9e98-a0ab-433c-9f17-cd948945344b" />
-
+<br/>
+<img width="623" height="532" alt="image" src="https://github.com/user-attachments/assets/e2ebdfc6-8706-4eaa-a057-a3bcfa4830dd" />
+<br/><br/>
 
 Prva komponenta RabbitMQ servera je generički tcp soket koji služi kao ulazna/izlazna tačka za komunikaciju. Ona dalje komunicira sa Reader komponentom koja čita bajtove koji stižu sa mreže i šalje ih framing channel-u koji ih pretvara u AMQP frejmove. Channel komponenta izvršava AMQP komande, updavlja transakcijama i proverava permisije. Writer komponenta prima frejmove od channel-a i pretvara ih u bajtove za slanje preko mreže. RabbitMQ server takođe sadrži i mnesia-u što je distribuirana baza podataka u Erlang-u koja čuva definicije queue-ova i exchange-ova, naloge korisnika i njihove permisije. Poslednja komponenta servera je amqqueue tj red čekanja poruka koje još uvek nisu obrađene.  
 
