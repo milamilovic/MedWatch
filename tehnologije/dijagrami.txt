@@ -1,4 +1,4 @@
-// RabbitMQ Component Diagram
+// RabbitMQ Server Components (PlantUML)
 @startuml RabbitMQ_Server_Components
 
 component "gen_tcp\n(Erlang Socket)" as GenTcp
@@ -21,3 +21,27 @@ Writer --> GenTcp
 
 @enduml
 
+// RabbitMQ Component diagram (Mermaid)
+graph LR
+    Publisher[Publisher] --> Exchange[Exchange<br/>Direct/Fanout/Topic/Headers]
+    Exchange --> Binding[Binding]
+    Binding --> Queue[Queue]
+    Queue --> Consumer[Consumer]
+    
+    Connection[Connection] -.-> Channel[Channel]
+    Channel -.-> VHost[Virtual Host]
+    
+    Queue --> Storage[(Persistent<br/>Storage)]
+    
+    Management[Management UI] -.-> Broker[RabbitMQ Broker]
+    API[HTTP API] -.-> Broker
+    
+    classDef client fill:#e1f5ff,stroke:#0078d4,stroke-width:2px
+    classDef core fill:#fff4e1,stroke:#ff8c00,stroke-width:2px
+    classDef storage fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
+    classDef mgmt fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
+    
+    class Publisher,Consumer client
+    class Exchange,Binding,Queue,Connection,Channel,VHost,Broker core
+    class Storage storage
+    class Management,API mgmt
