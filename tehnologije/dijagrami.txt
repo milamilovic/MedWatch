@@ -1,0 +1,23 @@
+// RabbitMQ Component Diagram
+@startuml RabbitMQ_Server_Components
+
+component "gen_tcp\n(Erlang Socket)" as GenTcp
+component "Reader" as Reader
+component "Writer" as Writer
+component "Framing Channel" as FramingChannel
+component "Channel\n(Logical Connection)" as Channel
+database "Mnesia\n(Distributed DB)" as Mnesia
+component "amqqueue\n(Queue Process)" as AmqQueue
+
+GenTcp --> Reader
+Reader --> Channel
+Channel --> Mnesia
+Channel --> AmqQueue
+
+AmqQueue --> Channel
+Channel --> FramingChannel
+FramingChannel --> Writer
+Writer --> GenTcp
+
+@enduml
+
