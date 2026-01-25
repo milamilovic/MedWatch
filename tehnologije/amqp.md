@@ -28,24 +28,24 @@ RabbitMQ je broker poruka otvorenog koda. Inicjalno implementira AMQP protokol a
 Ključne komponente RabbitMQ-a su:
 
 ### Producer
-aplikacija koja šalje poruke i one se ne šalju direktno u queue već u exchange
-todo
+Producer ili publisher je aplikacija koja šalje poruke. Ista aplikacija može u isto vreme biti i producer i consumer tj može i da šalje i da prima poruke. Poruke se šalju u exchange-ove. Poruke se zatim rutiraju u odgovarajući queue na osnovu ključa koji producer šalje. Implemenitran je *acknowledgement mechanism* odnosno mehanizam u kom broker potvrdjuje producer-u da je poruka primljena. Producer može da postavi i metadata odnosno dodatne atribute za poruke kao što su timestamp, prioritet, persistence mode i slično.
 
 ### Exchange
-prima poruke od producera i rutira ih u queue-ove prema pravilima
-todo
+Prima poruke od producera i rutira ih u queue-ove prema pravilima. Postoje četiri tipa exchange-a:
+- **Direct** - rutira poruke na osnovu tačnog poklapanja ključa za rutiranje
+- **Fanout** - broadcast svim povezanim queue-ovima, ignoriše ključ za rutiranje
+- **Topic** - rutira poruke na osnovu pattern matching-a ključa za rutiranje
+- **Headers** - rutira na osnovu header atributa umesto ključa za rutiranje
+Obavezni atributi exchange-a su trajnost koja opisuje da li će exchange preživeti restart i auto-deletion koji govori da li će se exchange obrisati kada se oslobodi poslednji binding.
 
 ### Queue
-bafer koji čuva poruke u po jednom FIFO redu za svakog consumer-a dok on ne bude spreman da ih obradi
-todo
+Bafer koji čuva poruke u po jednom FIFO redu za svakog consumer-a dok on ne bude spreman da ih obradi odnosno uređena kolekcija poruka. Svaki consumer ima svoj queue. Queue može čuvati poruke na disku ili u memoriji u zavisnosti od persistence mode-a. Obavezni atributi queue-a su ime, durability (da li preživljava restart brokera), exclusive (da li će biti obrisan nakon završetka jedne konekcije) kao i auto-delete koji govori da li će queue koji je imao makar jednog consumer-a biti obrisan kada se on unsubscribe-uje.
 
 ### Binding
-veza između exchange-a i queue-a sa pravilom (pattern) koje određuje koje poruke će biti rutirane u taj queue
-todo
+Veza između exchange-a i queue-a sa pravilom (pattern) koje određuje koje poruke će biti rutirane u taj queue. Binding sadrži source name koji je u stvari ime exchange-a, destination name tj ime ciljanog queue-a ili exchange-a, destination type i još opcionih argumenata poput header-a. Jedan queue može imati više bindinga, i jedan exchange može biti povezan sa više queue-ova. 
 
 ### Consumer
-aplikacija koja prima i obrađuje poruke iz queue-a
-todo
+Consumer je aplikacija koja prima i obrađuje poruke iz queue-a. Consumer subscribe-uje na neki queue i automatski mu se dostavljaju poruke iz njega. Prilikom registracije mogu da odaberu manual ili automatic delivery type odnosno da li šalje potvrdu prijema ili ne. Da bi se consumer otkazao mora biti poznat njegov identifikator odnosno tag i kada se on otkaže poruke odmah prestaju da mu se prosleđuju. 
 
 ### Management UI
 todo
@@ -83,3 +83,11 @@ https://www.rabbitmq.com/resources/google-tech-talk-final/google
 https://www.rabbitmq.com/resources/specs/amqp0-9-1.pdf
 
 https://www.rabbitmq.com/tutorials/amqp-concepts
+
+https://www.rabbitmq.com/docs/publishers
+
+https://www.rabbitmq.com/docs/exchanges
+
+https://www.rabbitmq.com/docs/queues
+
+https://www.rabbitmq.com/docs/consumers
