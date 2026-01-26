@@ -48,26 +48,26 @@ Veza između exchange-a i queue-a sa pravilom (pattern) koje određuje koje poru
 Consumer je aplikacija koja prima i obrađuje poruke iz queue-a. Consumer subscribe-uje na neki queue i automatski mu se dostavljaju poruke iz njega. Prilikom registracije mogu da odaberu manual ili automatic delivery type odnosno da li šalje potvrdu prijema ili ne. Da bi se consumer otkazao mora biti poznat njegov identifikator odnosno tag i kada se on otkaže poruke odmah prestaju da mu se prosleđuju. 
 
 ### Management UI
-todo
+Web interfejs za administraciju i monitoring RabbitMQ brokera. Omogućava pregled i kreiranje queue-ova, exchange-ova i bindinga, monitoring metrika, upravljanje korisnicima i permisijama, slanje i primanje test poruka kao i pregled aktivnih konekcija i channel-a. Implementiran kao plugin i pristupa se preko HTTP porta (obično 15672).
+
+### HTTP API
+RESTful API koji omogućava programski pristup RabbitMQ managementu. Pruža iste mogućnosti kao Management UI, osnosno CRUD operacije za queue-ove, exchange-ove i binding-e, slanje i primanje poruka, monitoring i statistike, upravljanje korisniciima i vhost-ovima i health checks. API koristi HTTP basic authentication i vraća JSON odogovore.
 
 ### Broker
-Implementacija RabbitMQ Brokera se sastoji od generičkog tcp soket-a koji služi kao ulazna/izlazna tačka za komunikaciju. Ona dalje komunicira sa Reader komponentom koja čita bajtove koji stižu sa mreže i šalje ih framing channel-u koji ih pretvara u AMQP frejmove. Channel komponenta izvršava AMQP komande, updavlja transakcijama i proverava permisije. Writer komponenta prima frejmove od channel-a i pretvara ih u bajtove za slanje preko mreže. RabbitMQ server takođe sadrži i mnesia-u što je distribuirana baza podataka u Erlang-u koja čuva definicije queue-ova i exchange-ova, naloge korisnika i njihove permisije. Poslednja komponenta servera je amqqueue tj red čekanja poruka koje još uvek nisu obrađene.
+RabbitMQ broker je centralna komponenta koja prima, rutira i čuva poruke. Implementacija RabbitMQ Brokera se sastoji od generičkog tcp soket-a koji služi kao ulazna/izlazna tačka za komunikaciju. Ona dalje komunicira sa Reader komponentom koja čita bajtove koji stižu sa mreže i šalje ih framing channel-u koji ih pretvara u AMQP frejmove. Channel komponenta izvršava AMQP komande, updavlja transakcijama i proverava permisije. Writer komponenta prima frejmove od channel-a i pretvara ih u bajtove za slanje preko mreže. RabbitMQ server takođe sadrži i mnesia-u što je distribuirana baza podataka u Erlang-u koja čuva definicije queue-ova i exchange-ova, naloge korisnika i njihove permisije. Poslednja komponenta servera je amqqueue tj red čekanja poruka koje još uvek nisu obrađene.
 
 <br/>
 <img width="623" height="532" alt="image" src="https://github.com/user-attachments/assets/e2ebdfc6-8706-4eaa-a057-a3bcfa4830dd" />
 <br/><br/>
 
-### HTTP API
-todo
-
 ### Connection
-todo
+TCP konekcija između klijenta i brokera. Njeni atributi su to da li je enkriptovana (TLS) i da li se koristi autentifikacija (ili pomoću korisničkog imena i password-a ili pomoću sertifikata). Kada aplikaciji više nije potrebna konekcija treba da je zatvori upravo ovu ampq konekciju a ne tcp konekciju i na taj način se radi graceful shutdown.
 
 ### Channel
-todo
+Ponekad je aplikacijama potrebno da imaju više konekcija ka brokeru i kanal je u stvari apstrakcija toga da se više amqp konekcija oslanja na jednu tcp konekciju. Komunikacije na različitim kanalima su potpuno izolovane jedna od druge. Kanal postoji samo u kontekstu konekcije odnosno kada se konekcija zatvori zatvaraju se i svi kanali koji se oslanjaju na nju. Ako aplikacije koriste više niti ili procesa u obradi preporučljivo je da se otvori novi kanal za svaki od njih.
 
 ### Virtual host
-todo
+Logička izolacija koja omogućava da jedan broker hostuje više nezavisnih ,,okruženja". Virtual host omogućuje potpunu izolaciju exchange-ova, queue-ova i binding-a, odvojene grupe korisnika i permisija, nezavisne politike i limite. Vhost-ovi se kreiraju i brišu pomoću HTTP API-ja. Različiti vhosts mogu deliti iste fizičke resurse ali su logički potpuno odvojeni.
 
 ## Reference
 https://en.wikipedia.org/wiki/Advanced_Message_Queuing_Protocol
@@ -91,3 +91,9 @@ https://www.rabbitmq.com/docs/exchanges
 https://www.rabbitmq.com/docs/queues
 
 https://www.rabbitmq.com/docs/consumers
+
+https://www.rabbitmq.com/docs/management
+
+https://www.rabbitmq.com/docs/connections
+
+https://www.rabbitmq.com/docs/vhosts
