@@ -12,18 +12,17 @@ Cargo je package manager za rust. On preuzima zavisnosti, kompajlira pakete i po
 <img src="https://github.com/user-attachments/assets/08f6a2c0-a863-4028-a3c1-132332d0adad" />
 <br/><br/>
 
-
 ### Lekser i parser
-todo
+Lekser odnosno tokenizator izvodi prvu fazu kompajliranja. On čita source kod kao običan tekst i pretvara ga u tokene koji su najmanje jedinice jezika i mogu biti ključne reči, identifikatori, literali ili operatori. Rust lekser je implementiran kao biblioteka *rustc_lexer* i to tako da radi bez alokacije memorije i zbog toga je veoma brz. Naredni korak u kompajliranju je parsiranje. Parser uzima niz tokena koji lekser kreira i gradi AST (Abstract Syntax Tree). Rust parser je implementiran tako da može da se oporavi od grešaka što je korisno zbog toga što može da prikaže korisniku sve sintaksne greške odjednom umesto da stane nakon prve. AST čuva i informacije o poziciji što omogućava preciznije poruke o greški koje korisniku pokazuju tačno gde se greška nalazi. 
 
 ### HIR
-todo
+HIR odnosno High-level Intermediate Representation nastaje nakon AST-a gde je sintaksa pojednostavljena odnosno prilagođenija kompajleru, ali još uvek ljudski čitljiva. Proces koji se zove HIR lowering pretvara AST u HIR strukturu se nazizva AST lowering. HIR se koristi i za type inference odnosno automatsku detekciju tipova, ali i type checking gde se tip koji je napisan u programu poredi sa onim koji je kompajler detektovao.   
 
 ### MIR
-todo
+HIR se dodatno spušta na MIR odnosno Mid-level Intermediate Representation koji se koristi za borrow checking uz pomoć THIR strukture koja je dodatno pojednostavljeni HIR. Borrow checker zapravo radi analizu toka podataka i proverava da li su pravila za pozajmlijvanje ispoštovana u svim mogućim scenarijima. Većina optimizacija koda se dešava na MIR-u. MIR lowering-om se pattern matching iz HIR-a pretvara u decision stabla, petlje pretvaraju u  control flow graph, a složeni izrazi se razlažu na jednostavnije operacije. Ovde se takođe odvija memorphization koji pretvara generički kod u konkretne verzije za svaki tip koji se koristi. Na taj način veličina binarnog koda bude veća ali se ubrzava izvršavanje. 
 
 ### LLVM IR
-todo
+LLVM je set kompajlerskih tehnologija koji kreira optimizovan binarni kod za konkretnu platformu. *rustic* koristi LLVM za generianje koda tako da MIR mora prvo da se pretvori u LLVM IR (language-independent intermediate representation) koji je poput asemblera na visokom niovu koji sadrži mnogo anotacija. Taj LLVM IR se prosleđuje LLVM-u koji radi još optimizacija i proizvodi mašinski kod. 
 
 ## Reference
 https://en.wikipedia.org/wiki/Rust_(programming_language)
@@ -33,3 +32,9 @@ https://medium.com/codex/rust-101-everything-you-need-to-know-about-rust-f3dd0ae
 https://doc.rust-lang.org/cargo/
 
 https://kanishkarj.github.io/rust-internals-mir
+
+https://rustc-dev-guide.rust-lang.org/overview.html
+
+https://doc.rust-lang.org/nightly/nightly-rustc/rustc_lexer/index.html
+
+https://en.wikipedia.org/wiki/LLVM
