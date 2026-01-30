@@ -34,7 +34,7 @@ Garbage Collector služi za održavanje efikasnosti i čišćenje Object Storage
 ### Catalog (metadata)
 Catalog je centralizovana baza metapodataka. U njemu se čuvaju informacije o strukturi podataka, tačnije definicije tabela i kolona, kao i metapodaci o Parquet fajlovima poput lokacije u Object Storage-u i statusa. InfluxDB koristi baze podataka kompatibilne sa PostgreSQL-om za uptavljanje Catalog-om. 
 
-### Object Storage 
+### Object Storage (Parquet files)
 To je glavno i trajno skladište podataka u InfluxDB-u i u njemu se vremenske serije čuvaju u formatu Parquet fajlova. Parquet je kolumnarni format skladištenja koji omogućava visoku kompresiju i efikasno čitanje podataka. Parquet fajlovi mogu da budu skladišteni u Object Storage bazama koje se mogu nalaziti lokalno na disku, ali i u nekom od cloud servisa poput S3 bucket-a na AWS-u ili Azure Blob Storage-a ili Google Cloud Storage-a.
 
 ### Apache Arrow
