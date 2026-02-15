@@ -1,0 +1,65 @@
+services:
+  # LocalStack for AWS SNS simulation
+  localstack:
+    image: localstack/localstack:latest
+    container_name: medwatch-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sns,sqs
+      - DEBUG=0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - medwatch-net
+
+  # Vulnerable SNS Publisher
+  sns-vulnerable:
+    build:
+      context: ./sns-attacks/vulnerable
+      dockerfile: Dockerfile
+    container_name: sns-vulnerable
+    ports:
+      - "5001:8080"
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - SNS_ENDPOINT=http://localstack:4566
+      - RUST_LOG=debug
+    depends_on:
+      localstack:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - medwatch-net
+
+  # Mitigated SNS Publisher
+  sns-mitigated:
+    build:
+      context: ./sns-attacks/mitigated
+      dockerfile: Dockerfile
+    container_name: sns-mitigated
+    ports:
+      - "5002:8080"
+    environment:
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+      - SNS_ENDPOINT=http://localstack:4566
+      - RUST_LOG=info
+      - JWT_SECRET=very-big-secret-key-for-demo
+    depends_on:
+      localstack:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - medwatch-net
+
+networks:
+  medwatch-net:
+    driver: bridge
