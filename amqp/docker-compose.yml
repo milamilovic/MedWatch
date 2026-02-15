@@ -1,0 +1,146 @@
+version: '3.8'
+
+services:
+  # ========================================
+  # Vulnerable
+  # ========================================
+  rabbitmq-vulnerable:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq-vulnerable
+    hostname: rabbitmq-vulnerable
+    ports:
+      - "5672:5672"      # AMQP port
+      - "15672:15672"    # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - ./rabbitmq-configs/vulnerable.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks:
+      - vulnerable-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========================================
+  # mitigated RabbitMQ Broker
+  # ========================================
+  rabbitmq-secure:
+    image: rabbitmq:3.12-management
+    container_name: rabbitmq-secure
+    hostname: rabbitmq-secure
+    ports:
+      - "5673:5672"      # AMQP port
+      - "15673:15672"    # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: "StrongPassword!2026"
+    volumes:
+      - ./rabbitmq-configs/secure.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq-configs/init-secure.sh:/init-secure.sh:ro
+    networks:
+      - secure-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    entrypoint: /bin/bash -c "docker-entrypoint.sh rabbitmq-server & sleep 10 && bash /init-secure.sh && wait"
+
+  # ========================================
+  # vulnerable app
+  # ========================================
+  vulnerable-app:
+    build:
+      context: ./vulnerable
+      dockerfile: Dockerfile
+    image: iot-vulnerable:latest
+    container_name: iot-vulnerable
+    depends_on:
+      rabbitmq-vulnerable:
+        condition: service_healthy
+    environment:
+      RABBITMQ_HOST: rabbitmq-vulnerable
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+    networks:
+      - vulnerable-net
+    restart: unless-stopped
+
+  # ========================================
+  # attacker
+  # ========================================
+  attacker:
+    build:
+      context: ./attacker
+      dockerfile: Dockerfile
+    image: amqp-attacker:latest
+    container_name: attacker
+    depends_on:
+      rabbitmq-vulnerable:
+        condition: service_healthy
+    environment:
+      RABBITMQ_HOST: rabbitmq-vulnerable
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: guest
+      RABBITMQ_PASS: guest
+    networks:
+      - vulnerable-net
+    profiles:
+      - attack  # run with docker-compose --profile attack up
+    stdin_open: true
+    tty: true 
+
+  attacker-secure:
+    build:
+      context: ./attacker
+      dockerfile: Dockerfile
+    image: amqp-attacker:latest
+    container_name: attacker-secure
+    depends_on:
+      rabbitmq-secure:
+        condition: service_healthy
+    environment:
+      RABBITMQ_HOST: rabbitmq-secure
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: iot_device
+      RABBITMQ_PASS: "SecurePassword!2026"
+      # guest credentials
+      # RABBITMQ_USER: guest
+      # RABBITMQ_PASS: guest
+      # wrong credentials
+      # RABBITMQ_USER: admin
+      # RABBITMQ_PASS: wrong_password
+    networks:
+      - secure-net
+    profiles:
+      - attack-secure
+
+  # ========================================
+  # mitigated app
+  # ========================================
+  mitigated-app:
+    build:
+      context: ./mitigated
+      dockerfile: Dockerfile
+    container_name: iot-secure
+    depends_on:
+      rabbitmq-secure:
+        condition: service_healthy
+    environment:
+      RABBITMQ_HOST: rabbitmq-secure
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: iot_device
+      RABBITMQ_PASS: "StrongPassword!2026"
+    networks:
+      - secure-net
+    restart: unless-stopped
+
+networks:
+  vulnerable-net:
+    driver: bridge
+  secure-net:
+    driver: bridge
