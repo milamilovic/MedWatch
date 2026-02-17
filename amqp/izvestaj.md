@@ -24,19 +24,22 @@ Napad eksploatiše kombinaciju podrazumevanih kredencijala (guest/guest), odsust
 Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali su teorijski relevantni za potpunu bezbednosnu analizu sistema. 
 
 - #### DoS HTTP API-ja
-    
+    Ukoliko napadač koji poseduje potrebne kredencijale počne da šalje izuzetno velike poruke putem HTTP Management API-ja (na portu 15672) može da dođe do iscrpljivanja resursa i broker može da padne. Razlika ovog napada u odnosu na implementirani je u tome što se ovde napad ne izvodi preko AMQP protokola, već preko HTTP-a i direktno je napad na RabbitMQ putem njegovog HTTP API-ja za slanje poruka. Pogođene verzije RabbitMQ brokera su < 3.11.24 i < 3.12.7. Mitigacije za ovaj napad su ograničenja prava pristupa Management API-ju i ograničavanje veličine poruka pomoću reverse proxy-ja ili upgrade na zakrpljenu verziju brokera.
 
 - #### DoS consumer aplikacije
-    TODO
+    Ranjivost se nalazi na klijentskoj strani u RabbitMQ biblioteci gde se ignoriše postavljeno ograničenje u dužini poruke što omogućava denial of service. Napadač koji ima potrebna prava pristupa može da pošalje poruku koja je veća od dostupne memorije procesa i time obori consumera koji dobije OOM error. Pogođene verzije biblioteke com.rabbitmq:amqp-client su < 5.14.3 / 5.16.1 / 5.17.1 / 5.18.0. Mitigacije za ovaj napad su ograničavanje veličine poruka na samom brokeru i unapređivanje na zakrpljenu verziju biblioteke.
 
 - #### Loše kreiran AMQP
-    TODO
+    Napadač bez ikakvih kredencijala može da šalje zlonamerne pakete koristeći AMQP sa verzijom ispod 1.0 (AMQP 0-8, 0-9, 0-91 and 0-10) i ti paketi su u stvari komande kreirane tako da obore broker-a. Mitigacije za ovo su validacija unosa i korišćenje broker-a koji je napravljen nad AMQP verzijom 1.0 ili više.
 
 - #### Konfiguraciona manipulacija (policy injection)
-    TODO
+    Napadač sa odgovarajućim pravima pristupa može da kreira destruktivne runtime policy-je tako da izazove prekid toga podataka bez obaranja brokera. Ovo može da se postigne postavljanjem TTL poruka na 0 čime poruke ističu čim pristignu u red pa consumer ne stigne da ih pročita. Drugi način je postavljanje maksimalne dužine poruka na 0 i overflow na reject-publish čime se sve nove poruke odbijaju. Mitigacije za ovaj napad su postavljanje prava pristupa tako da se publisher-ima dodele prava pisanja samo za jedan red bez configure prava. 
 
 ## Reference
 https://www.rabbitmq.com/docs/memory
+
 https://app.opencve.io/cve/CVE-2023-46118
+
 https://app.opencve.io/cve/CVE-2023-46120
+
 https://security.snyk.io/vuln/SNYK-JAVA-ORGAPACHEQPID-173747
