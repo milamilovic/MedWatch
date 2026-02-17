@@ -19,7 +19,9 @@ Napad eksploatiše kombinaciju podrazumevanih kredencijala (guest/guest), odsust
     Mitigovan sistem se kao i ranjiv sastoji iz RabbitMQ message brokera i aplikacije u Rust-u, ali je RabbitMQ konfigurisan tako da su podrazumevani kredencijali za prijavu zamenjeni sa nalogom sa jakom šifrom i dodato je ograničenje i u broju poruka i u njihovoj dužini. Sama aplikacija za razliku od ranjive sadrži validaciju veličine poruka, rate limiting i ograničenjima u vezi queue-ova.
 
 - #### Video demonstracija
-    TODO
+    
+https://github.com/user-attachments/assets/6a438d1e-c001-444f-89ef-e0c98fea016c
+
 
 ### Napadi koji nisu realizovani
 Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali su teorijski relevantni za potpunu bezbednosnu analizu sistema. 
