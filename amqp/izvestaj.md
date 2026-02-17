@@ -3,7 +3,8 @@
 Analiziran je sistem za zdravstveni monitoring gde IoT uređaji šalju medicinske podatke pacijenata putem AMQP message broker-a, konkretno RabbitMQ-a. Kao bezbednosna pretnja identifikovana je kategorija napda koji ciljaju dostupnost (availability) sistema prema CIA trijadi. 
 
 ## Stablo napada
-<img width="4208" height="812" alt="image" src="https://github.com/user-attachments/assets/abca2d73-efee-44cb-8ac6-eb9b7e5b4399" />
+<img width="4281" height="956" alt="image" src="https://github.com/user-attachments/assets/8e503eb8-a5e2-4287-8a1c-1b48d5742fa7" />
+
 
 ### Praktično realizovan napad
 Napad eksploatiše kombinaciju podrazumevanih kredencijala (guest/guest), odsustva ograničenja veličine poruka i odsustva ograničenja u broju redova. Sistem koji je implementiran se sastoji iz tri komponente koje su kontejnerizovane i organizovane pomoću docker compose-a. Ovaj napad spada u CWE-400 i CWE-770 po mitre terminologiji, odnosno dešava se Uncontrolled Resource Consumption i Allocation of Resources Without Limits or Throttling.
@@ -26,7 +27,7 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
 - #### DoS HTTP API-ja
     CVE-2023-46118
   
-    DoS ranjivost u RabbitMQ HTTP Management API-ju. Ukoliko napadač koji poseduje potrebne kredencijale počne da šalje izuzetno velike poruke putem HTTP Management API-ja (na portu 15672) može da dođe do iscrpljivanja resursa i broker može da padne zbog OOM greške koja obara proces brokera. Razlika ovog napada u odnosu na implementirani je u tome što se ovde napad ne izvodi preko AMQP protokola, već preko HTTP-a. Pogođene verzije RabbitMQ brokera su < 3.12.6. Mitigacije za ovaj napad su ograničenja prava pristupa Management API-ju i ograničavanje veličine poruka pomoću reverse proxy-ja ili upgrade na zakrpljenu verziju brokera.
+    DoS ranjivost u RabbitMQ HTTP Management API-ju. Ukoliko napadač koji poseduje potrebne kredencijale počne da šalje izuzetno velike poruke putem HTTP Management API-ja (na portu 15672) može da dođe do iscrpljivanja resursa i broker može da padne zbog OOM greške koja obara proces brokera. Razlika ovog napada u odnosu na implementirani je u tome što se ovde napad ne izvodi preko AMQP protokola, već preko HTTP-a. Pogođene verzije RabbitMQ brokera su < 3.11.24 i < 3.12.6. Mitigacije za ovaj napad su ograničenja prava pristupa Management API-ju i ograničavanje veličine poruka pomoću reverse proxy-ja ili upgrade na zakrpljenu verziju brokera.
 
 - #### DoS consumer aplikacije
     CVE-2023-46120
@@ -41,7 +42,7 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
 - #### Brisanje redova
     CVE-2019-11287
   
-    Ranjivost pogađa pogađa web management plugin RabbitMQ servera gde ne postoji validacija X-reason header-a u HTTP zaglavlju što omogućava napadaču da maliciozni Erlang format string koji se ekspanzuje tokom obrade i prekomerno troši memoriju na heap-u što izaziva pad servera i denial of service. Mitigacija za ovaj napad je unapređenje verzije RabbitMQ na 3.8.1 ili više. 
+    Ranjivost pogađa pogađa web management plugin RabbitMQ servera gde ne postoji validacija X-reason header-a u HTTP zaglavlju što omogućava napadaču da maliciozni Erlang format string koji se ekspanzuje tokom obrade i prekomerno troši memoriju na heap-u što izaziva pad servera i denial of service. Mitigacija za ovaj napad je unapređenje verzije RabbitMQ na > 3.8.1 ili > 3.7.21. 
 
 ## Reference
 https://www.rabbitmq.com/docs/memory
