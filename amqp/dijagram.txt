@@ -65,3 +65,9 @@ flowchart TD
 
     E1 -.-> M3
     E2 -.-> M3
+
+    %% Definicija plave klase
+    classDef plavo fill:#4a90e2,color:#ffffff,stroke:#1c3d73;
+
+    %% Dodela klase svim čvorovima podstabla A
+    class A,A1,A2,A3,M1,M2,M3,M4 plavo;
