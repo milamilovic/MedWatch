@@ -24,7 +24,7 @@ Napad eksploatiše kombinaciju podrazumevanih kredencijala (guest/guest), odsust
 Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali su teorijski relevantni za potpunu bezbednosnu analizu sistema. 
 
 - #### DoS HTTP API-ja
-    TODO
+    
 
 - #### DoS consumer aplikacije
     TODO
@@ -34,3 +34,9 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
 
 - #### Konfiguraciona manipulacija (policy injection)
     TODO
+
+## Reference
+https://www.rabbitmq.com/docs/memory
+https://app.opencve.io/cve/CVE-2023-46118
+https://app.opencve.io/cve/CVE-2023-46120
+https://security.snyk.io/vuln/SNYK-JAVA-ORGAPACHEQPID-173747
