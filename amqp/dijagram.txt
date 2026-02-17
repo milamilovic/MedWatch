@@ -1,0 +1,67 @@
+flowchart TD
+
+    ROOT["Dostupnost"]
+
+    %% Glavne grane
+    A["Resource Exhaustion"]
+    B["DoS HTTP API-ja"]
+    C["DoS consumer aplikacije"]
+    D["Loše kreiran AMQP"]
+    E["Policy manipulacija"]
+
+    ROOT --> A
+    ROOT --> B
+    ROOT --> C
+    ROOT --> D
+    ROOT --> E
+
+    %% A grana
+    A1["Velike AMQP poruke"]
+    A2["Mnogo trajnih redova"]
+    A3["Message flooding"]
+
+    A --> A1
+    A --> A2
+    A --> A3
+
+    %% B grana
+    B1["Velike HTTP poruke"]
+    B --> B1
+
+    %% C grana
+    C1["OOM consumer"]
+    C --> C1
+
+    %% D grana
+    D1["Zlonamerni AMQP paketi"]
+    D --> D1
+
+    %% E grana
+    E1["TTL=0 policy"]
+    E2["max-length=0"]
+
+    E --> E1
+    E --> E2
+
+    %% MITIGACIJE
+    M1["Ograničavanje veličine poruke"]
+    M2["Rate limiting"]
+    M3["Auth + RBAC"]
+    M4["Memory/Queue limiti"]
+    M5["Validacija unuosa i patching"]
+
+    %% Povezivanje mitigacija
+    A1 -.-> M1
+    A3 -.-> M2
+    A2 -.-> M4
+
+    B1 -.-> M1
+    B1 -.-> M3
+
+    C1 -.-> M1
+    C1 -.-> M4
+
+    D1 -.-> M5
+
+    E1 -.-> M3
+    E2 -.-> M3
