@@ -1,13 +1,13 @@
 flowchart TD
 
-    ROOT["Dostupnost"]
+    ROOT["Napadi na dostupnost (Availability)"]
 
     %% Glavne grane
-    A["Resource Exhaustion"]
-    B["DoS HTTP API-ja"]
-    C["DoS consumer aplikacije"]
-    D["Loše kreiran AMQP"]
-    E["Policy manipulacija"]
+    A["Resource Exhaustion (CWE-400, CWE-770)"]
+    B["HTTP API DoS (CVE-2023-46118)"]
+    C["Consumer DoS (CVE-2023-46120)"]
+    D["AMQP 1.0 Plugin DoS (CVE-2021-22116)"]
+    E["Management Plugin DoS (CVE-2019-11287)"]
 
     ROOT --> A
     ROOT --> B
@@ -17,7 +17,7 @@ flowchart TD
 
     %% A grana
     A1["Velike AMQP poruke"]
-    A2["Mnogo trajnih redova"]
+    A2["Masovno kreiranje durable redova"]
     A3["Message flooding"]
 
     A --> A1
@@ -25,49 +25,46 @@ flowchart TD
     A --> A3
 
     %% B grana
-    B1["Velike HTTP poruke"]
+    B1["Preveliko telo HTTP zahteva"]
     B --> B1
 
     %% C grana
-    C1["OOM consumer"]
+    C1["DoS consumera"]
     C --> C1
 
     %% D grana
-    D1["Zlonamerni AMQP paketi"]
+    D1["Maliciozni AMQP 1.0 paket"]
     D --> D1
 
     %% E grana
-    E1["TTL=0 policy"]
-    E2["max-length=0"]
-
+    E1["Maliciozni X-Reason header"]
     E --> E1
-    E --> E2
 
     %% MITIGACIJE
-    M1["Ograničavanje veličine poruke"]
+    M1["Ograničenje veličine poruke"]
     M2["Rate limiting"]
-    M3["Auth + RBAC"]
-    M4["Memory/Queue limiti"]
-    M5["Validacija unuosa i patching"]
+    M4["Queue i memory limiti"]
+    M5["Patchovanje na sigurnu verziju"]
+    M6["Ograničiti pristup Management API-ju"]
 
     %% Povezivanje mitigacija
     A1 -.-> M1
-    A3 -.-> M2
     A2 -.-> M4
+    A3 -.-> M2
 
-    B1 -.-> M1
-    B1 -.-> M3
+    B1 -.-> M6
+    B1 -.-> M5
 
     C1 -.-> M1
-    C1 -.-> M4
+    C1 -.-> M5
 
     D1 -.-> M5
 
-    E1 -.-> M3
-    E2 -.-> M3
+    E1 -.-> M5
+
 
     %% Definicija plave klase
     classDef plavo fill:#4a90e2,color:#ffffff,stroke:#1c3d73;
 
     %% Dodela klase svim čvorovima podstabla A
-    class A,A1,A2,A3,M1,M2,M3,M4 plavo;
+    class A,A1,A2,A3,M1,M2,M4 plavo;
