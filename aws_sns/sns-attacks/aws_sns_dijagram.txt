@@ -1,0 +1,87 @@
+flowchart TD
+
+    ROOT["Napadi na integritet i dostupnost (CIA) – AWS SNS"]
+
+    %% Glavne grane
+    A["Message Injection (CWE-20, CWE-284)"]
+    B["Resource Exhaustion / Message Flooding (CWE-400, CWE-770)"]
+    C["SSRF putem HTTP pretplate (CWE-918, CWE-345)"]
+    D["AWS SDK ReDoS (CVE-2020-28472)"]
+    E["Log4Shell u subscriber aplikaciji (CVE-2021-44228)"]
+    F["IAM Privilege Escalation (CWE-269)"]
+
+    ROOT --> A
+    ROOT --> B
+    ROOT --> C
+    ROOT --> D
+    ROOT --> E
+    ROOT --> F
+
+    %% A grana – Message Injection
+    A1["Nema autentifikacije na /send-sos"]
+    A2["Nema validacije custom_message"]
+    A3["Neograničen pristup /admin/topics"]
+
+    A --> A1
+    A --> A2
+    A --> A3
+
+    %% B grana – DoS
+    B1["10 niti × 100 zahteva"]
+    B2["/send-bulk bez ograničenja count parametra"]
+    B3["Iscrpljivanje SNS SMS kvota i troškova"]
+
+    B --> B1
+    B --> B2
+    B --> B3
+
+    %% C grana – SSRF
+    C1["Nevalidiran x-amz-sns-signature header"]
+    C --> C1
+
+    %% D grana – SDK
+    D1["Specifično formatiran unos izaziva CPU exhaustion"]
+    D --> D1
+
+    %% E grana – Log4Shell
+    E1["Maliciozna poruka aktivira RCE u logger-u"]
+    E --> E1
+
+    %% F grana – IAM
+    F1["Preširoke sns:Publish privilegije"]
+    F2["Mogućnost sns:DeleteTopic"]
+    F --> F1
+    F --> F2
+
+    %% MITIGACIJE
+    M1["JWT autentifikacija"]
+    M2["Validacija i sanitizacija unosa"]
+    M3["Rate limiting"]
+    M4["Ograničenje veličine zahteva"]
+    M5["Upgrade ranjivih biblioteka"]
+    M6["IAM least privilege politika"]
+    M7["Validacija SNS potpisa"]
+
+    %% Povezivanje mitigacija
+    A1 -.-> M1
+    A2 -.-> M2
+    A3 -.-> M1
+
+    B1 -.-> M3
+    B2 -.-> M3
+    B2 -.-> M4
+
+    C1 -.-> M7
+
+    D1 -.-> M5
+
+    E1 -.-> M5
+
+    F1 -.-> M6
+    F2 -.-> M6
+
+    %% Definicija plave klase
+    classDef plavo fill:#4a90e2,color:#ffffff,stroke:#1c3d73;
+
+    %% Dodela klase realizovanom napadu (prakticni deo)
+    class A,A1,A2,A3,B,B1,B2,B3,M1,M2,M3,M4 plavo;
