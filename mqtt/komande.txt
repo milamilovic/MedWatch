@@ -1,0 +1,20 @@
+# Ranjivi broker passwd
+docker run --rm -v ${PWD}/vulnerable/broker:/mosquitto/config eclipse-mosquitto:1.4.10 sh -c "mosquitto_passwd -b -c /mosquitto/config/passwd patient1 pass_patient1 && mosquitto_passwd -b /mosquitto/config/passwd patient2 pass_patient2 && mosquitto_passwd -b /mosquitto/config/passwd monitor pass_monitor && mosquitto_passwd -b /mosquitto/config/passwd '#' wildcard_pass"
+
+# Mitigovani broker passwd
+docker run --rm -v ${PWD}/mitigated/broker:/mosquitto/config eclipse-mosquitto:2.0.18 sh -c "mosquitto_passwd -b -c /mosquitto/config/passwd patient1 pass_patient1 && mosquitto_passwd -b /mosquitto/config/passwd patient2 pass_patient2 && mosquitto_passwd -b /mosquitto/config/passwd monitor pass_monitor"
+
+
+docker compose up vulnerable-broker vulnerable-app
+docker compose --profile attack up attack
+docker compose down -v
+docker compose --profile mitigated up mitigated-broker mitigated-app
+onda rucno promeniti u docker compose attack-u 
+
+environment:
+    - BROKER_HOST=mitigated-broker
+    - BROKER_PORT=1883
+
+i onda 
+docker compose build attack
+docker compose --profile attack up attack

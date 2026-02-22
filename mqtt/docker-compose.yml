@@ -1,0 +1,81 @@
+version: "3.8"
+
+services:
+  # ─── VULNERABLE BROKER ───────────────────────────────────────────
+  vulnerable-broker:
+    build:
+      context: ./vulnerable/broker
+      dockerfile: Dockerfile
+    container_name: vulnerable-broker
+    ports:
+      - "1883:1883"
+    networks:
+      - mqtt-net
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 1883 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 3s
+
+  # ─── VULNERABLE APPLICATION ─────────────────
+  vulnerable-app:
+    build:
+      context: ./vulnerable/app
+      dockerfile: Dockerfile
+    container_name: vulnerable-app
+    depends_on:
+      vulnerable-broker:
+        condition: service_healthy
+    environment:
+      - BROKER_HOST=vulnerable-broker
+      - BROKER_PORT=1883
+    networks:
+      - mqtt-net
+
+  # ─── ATTACK ────────────────────────────────────────────────────
+  attack:
+    build:
+      context: ./attack
+      dockerfile: Dockerfile
+    container_name: mqtt-attacker
+    depends_on:
+      - vulnerable-broker
+    environment:
+      - BROKER_HOST=vulnerable-broker
+      - BROKER_PORT=1883
+    networks:
+      - mqtt-net
+    profiles:
+      - attack
+
+  # ─── MITIGATED BROKER ─────────────────────────────────────────
+  mitigated-broker:
+    build:
+      context: ./mitigated/broker
+      dockerfile: Dockerfile
+    container_name: mitigated-broker
+    ports:
+      - "1884:1883"
+    networks:
+      - mqtt-net
+
+  # ─── MITIGATED APPLICATION ────────────────────────────────────
+  mitigated-app:
+    build:
+      context: ./mitigated/app
+      dockerfile: Dockerfile
+    container_name: mitigated-app
+    depends_on:
+      - mitigated-broker
+    environment:
+      - BROKER_HOST=mitigated-broker
+      - BROKER_PORT=1883
+    networks:
+      - mqtt-net
+    profiles:
+      - mitigated
+
+networks:
+  mqtt-net:
+    driver: bridge
