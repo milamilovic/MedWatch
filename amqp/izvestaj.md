@@ -46,7 +46,26 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
 - #### DoS consumer aplikacije
     CVE-2023-46120
     
-    Ranjivost se nalazi na klijentskoj strani u RabbitMQ biblioteci gde se ne poštuje postavljeno ograničenje u dužini poruke što omogućava denial of service. Napadač koji ima potrebna prava pristupa može da pošalje preveliku poruku i time obori consumera koji dobije OOM error. Pogođene verzije biblioteke com.rabbitmq:amqp-client su < 5.18.0. Mitigacije za ovaj napad su ograničavanje veličine poruka na samom brokeru i unapređivanje na zakrpljenu verziju biblioteke.
+    Ranjivost se nalazi na klijentskoj strani u RabbitMQ biblioteci gde se ne poštuje postavljeno ograničenje u dužini poruke što omogućava denial of service. AMQP protokol dozvoljava definisanje maksimalne veličine okvira (frame_max) tokom pregovaranja konekcije, ali u ranjivim verzijama biblioteke se ova vrednost pregovara, ali se ne poštuje prilikom primanja poruka i alocira se memorija za poruku. Napadač koji ima potrebna prava pristupa može da pošalje preveliku poruku i time obori consumera koji dobije OOM error. Pogođene verzije biblioteke com.rabbitmq:amqp-client su < 5.18.0. Mitigacije za ovaj napad su ograničavanje veličine poruka na samom brokeru i unapređivanje na zakrpljenu verziju biblioteke. Zakrpljena verzija biblioteke je dodala sledeće provere prilikom kreiranja za proveru veličine poruke i proveru veličine frejma.
+    ```
+    long bodySize = this.contentHeader.getBodySize();
+    if (bodySize >= this.maxBodyLength) {
+        throw new IllegalStateException(format(
+            "Message body is too large (%d), maximum size is %d",
+            bodySize, this.maxBodyLength
+        ));
+    }
+    this.remainingBodyBytes = bodySize;
+    ```
+    ```
+    if (payloadSize >= maxPayloadSize) {
+        throw new IllegalStateException(format(
+            "Frame body is too large (%d), maximum size is %d",
+            payloadSize, maxPayloadSize
+        ));
+    }
+    ```
+    U ranjivim verzijama je bilo moguće slati kako velike frejmove tako i velike poruke. Ovo je moguće uraditi uz pomoć automatizovane skripte koja šalje prevelike poruke na otvorenu soket konekciju.
 
 - #### Loše kreiran AMQP
     CVE-2021-22116
@@ -74,3 +93,5 @@ https://nvd.nist.gov/vuln/detail/cve-2023-46120
 https://nvd.nist.gov/vuln/detail/CVE-2019-11287
 
 https://www.rabbitmq.com/docs/http-api-reference
+
+https://github.com/rabbitmq/rabbitmq-java-client/commit/714aae602dcae6cb4b53cadf009323ebac313cc8
