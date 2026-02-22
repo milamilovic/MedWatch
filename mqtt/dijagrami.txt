@@ -1,0 +1,59 @@
+flowchart TD
+    ROOT["Napadi na integritet (Integrity)"]
+
+    A["ACL Bypass (CVE-2017-7650)"]
+    B["Retained Message ACL Bypass (CVE-2018-12546)"]
+    C["Prazna ACL politika (CVE-2018-12550)"]
+    D["Autentifikacija malformiranim passwd (CVE-2018-12551)"]
+    E["Subscription bypass za offline klijente (CVE-2021-34434)"]
+
+    ROOT --> A
+    ROOT --> B
+    ROOT --> C
+    ROOT --> D
+    ROOT --> E
+
+    A1["Postavljanje client_id='#' ili '+'"]
+    A2["Publish na tuđi topic"]
+    A3["Subscribe na sve topice"]
+    A --> A1
+    A1 --> A2
+    A1 --> A3
+
+    B1["Publish retained poruke pre revokacije"]
+    B2["Budući subscriberi primaju zabranjene poruke"]
+    B --> B1
+    B1 --> B2
+
+    C1["Prazan ACL fajl — default allow"]
+    C2["Neograničen pristup svim topicima"]
+    C --> C1
+    C1 --> C2
+
+    D1["Malformiran passwd fajl"]
+    D2["Pristup bez lozinke"]
+    D --> D1
+    D1 --> D2
+
+    E1["Revokacija dok je klijent offline"]
+    E2["Klijent prima poruke po ponovnom spajanju"]
+    E --> E1
+    E1 --> E2
+
+    M1["Upgrade na Mosquitto >= 1.4.12"]
+    M2["Eksplicitna deny pravila u ACL"]
+    M3["Validacija client_id i username"]
+    M4["Zabrana wildcard karaktera u identifikatorima"]
+    M5["Redovna revizija passwd i ACL fajlova"]
+
+    A2 -.-> M1
+    A2 -.-> M3
+    A3 -.-> M4
+    B2 -.-> M2
+    C2 -.-> M2
+    C2 -.-> M5
+    D2 -.-> M5
+    E2 -.-> M1
+
+    classDef plavo fill:#4a90e2,color:#ffffff,stroke:#1c3d73;
+    class A,A1,A2,A3,M1,M3,M4 plavo;
