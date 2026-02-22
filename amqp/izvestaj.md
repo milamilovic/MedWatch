@@ -31,6 +31,18 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
   
     DoS ranjivost u RabbitMQ HTTP Management API-ju. Ukoliko napadač koji poseduje potrebne kredencijale počne da šalje izuzetno velike poruke putem HTTP Management API-ja (na portu 15672) može da dođe do iscrpljivanja resursa i broker može da padne zbog OOM greške koja obara proces brokera. Razlika ovog napada u odnosu na implementirani je u tome što se ovde napad ne izvodi preko AMQP protokola, već preko HTTP-a. Pogođene verzije RabbitMQ brokera su < 3.11.24 i < 3.12.6. Mitigacije za ovaj napad su ograničenja prava pristupa Management API-ju i ograničavanje veličine poruka pomoću reverse proxy-ja ili upgrade na zakrpljenu verziju brokera.
 
+    Na primer endpoint PUT /api/exchanges/{vhost}/{name} kreira exchange i prihvata json u telu zahteva koji treba da izgleda ovako:
+    ```
+    {
+      "type": "direct",
+      "auto_delete": false,
+      "durable": true,
+      "internal": false,
+      "arguments": {}
+    }
+    ```
+    Zbog toga što u ranjivim verzijama API-ja ne postoji validacija veličine tog json tela zahteva, napadač može slati telo zahteva sa veoma velikim telom (mnogo većim od očekivanog). Zbog toga što svaki zahtev alocira memoriju na heap-u koja se ne oslobodi dok zahtev ne bude obrađen, dolazi do nagomilavanja memorijske potrošnje sve dok se RabbitMQ broker ne ugasi. 
+
 - #### DoS consumer aplikacije
     CVE-2023-46120
     
@@ -60,3 +72,5 @@ https://nvd.nist.gov/vuln/detail/CVE-2021-22116
 https://nvd.nist.gov/vuln/detail/cve-2023-46120
 
 https://nvd.nist.gov/vuln/detail/CVE-2019-11287
+
+https://www.rabbitmq.com/docs/http-api-reference
