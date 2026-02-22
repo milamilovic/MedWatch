@@ -41,7 +41,7 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
       "arguments": {}
     }
     ```
-    Zbog toga što u ranjivim verzijama API-ja ne postoji validacija veličine tog json tela zahteva, napadač može slati telo zahteva sa veoma velikim telom (mnogo većim od očekivanog). Zbog toga što svaki zahtev alocira memoriju na heap-u koja se ne oslobodi dok zahtev ne bude obrađen, dolazi do nagomilavanja memorijske potrošnje sve dok se RabbitMQ broker ne ugasi. 
+    Zbog toga što u ranjivim verzijama API-ja ne postoji validacija veličine tog json tela zahteva, napadač može slati telo zahteva sa veoma velikim telom (mnogo većim od očekivanog). Zbog toga što svaki zahtev alocira memoriju na heap-u koja se ne oslobodi dok zahtev ne bude obrađen, dolazi do nagomilavanja memorijske potrošnje sve dok se RabbitMQ broker ne ugasi. Da bi se ovo izazvalo, dovoljan je HTTP klijent poput curl-a i automatizovana skripta koja neprestano šalje zahteve sa telom veličine nekoliko megabajta.
 
 - #### DoS consumer aplikacije
     CVE-2023-46120
