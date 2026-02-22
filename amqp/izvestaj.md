@@ -80,7 +80,13 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
 - #### Brisanje redova
     CVE-2019-11287
   
-    Ranjivost pogađa pogađa web management plugin RabbitMQ servera gde ne postoji validacija X-reason header-a u HTTP zaglavlju što omogućava napadaču da maliciozni Erlang format string koji se ekspanzuje tokom obrade i prekomerno troši memoriju na heap-u što izaziva pad servera i denial of service. Mitigacija za ovaj napad je unapređenje verzije RabbitMQ na > 3.8.1 ili > 3.7.21. 
+    Ranjivost pogađa pogađa web management plugin RabbitMQ servera gde ne postoji validacija X-reason header-a u HTTP zaglavlju što omogućava napadaču da ubaci maliciozni Erlang format string koji se ekspanzuje tokom obrade i prekomerno troši memoriju na heap-u što izaziva pad servera i denial of service. Mitigacija za ovaj napad je unapređenje verzije RabbitMQ na > 3.8.1 ili > 3.7.21.
+
+    Napad funkcioniše tako što napadač pokuša da prisilno zatvoriti neku aktivnu konekciju, gde web management plugin prihvata X-Reason polje kao tekstualni razlog zatvaranja. Ta vrednost se prosleđuje Erlang-ovoj io_lib:format/2 funkciji bez ikakve sanitizacije koja, slično printf u c-u, interpretira određene sekvence kao direktive za formatiranje. Payload koji je se može koristiti je
+    ```
+    ~9000000000n
+    ```
+    što je u stvari regex koji generiše string koji sadrži 9000000000 newline karaktera. Erlang runtime pokušava da alocira mesto na heap-u za string od 9 milijardi znakova, što izaziva naglu potrošnju memorije i CPU-ađ i na kraju ruši i sam broker na portu 5672 i management plugin na portu 15672.
 
 ## Reference
 https://www.rabbitmq.com/docs/memory
@@ -101,4 +107,8 @@ https://www.rabbitmq.com/docs/http-api-reference
 
 https://github.com/rabbitmq/rabbitmq-java-client/commit/714aae602dcae6cb4b53cadf009323ebac313cc8
 
+https://bugzilla.suse.com/show_bug.cgi?id=1186203#c5
+
 https://github.com/rabbitmq/rabbitmq-server/pull/2953/changes/87c9633c39e42e3c9426f1c47ae4c8080fd0b260
+
+https://github.com/DrunkenShells/Disclosures/tree/master/CVE-2019-11287-DoS%20via%20Heap%20Overflow-RabbitMQ%20Web%20Management%20Plugin
