@@ -70,7 +70,12 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
 - #### Loše kreiran AMQP
     CVE-2021-22116
     
-    Napadač bez ikakvih kredencijala može da šalje zlonamerne pakete koristeći AMQP sa verzijom ispod 1.0 i ti paketi su u stvari komande kreirane tako da obore broker-a. Mitigacije za ovo su validacija unosa i korišćenje RabbitMQ brokera sa verzijom >= 3.8.16.
+    Napadač bez ikakvih kredencijala može da šalje zlonamerne pakete koristeći AMQP sa verzijom ispod 1.0 i ti paketi su u stvari komande kreirane tako da obore broker-a. Mitigacije za ovo su validacija unosa i korišćenje RabbitMQ brokera sa verzijom >= 3.8.16. Konkretna ranjivost se nalazi u AMQP binarnom parseru gde se, ako napadač pošalje array sa viškom bajtova ili nedostajućim bajtovima, uslov za prekidanje parsera nikad ne ispuni i proces upada u beskonačnu petlju. Drugi problem je bio u obradi kratkih primitivnih tipova kao što su null, true, false i nulte vrednosti uint/ulong koje je parser prepoznavao, ali nije pomerao poziciju u binarnom baferu, što je izazivalo to da se isti bajt čita iznova i iznova.
+
+    Napad  koji eksploatiše ovu ranjivost funkcioniše tako što napadač otvara TCP konekciju na port 5672 i šalje validan AMQP 1.0 header (AMQP\x00\x01\x00\x00) da bi inicirao AMQP 1.0 sesiju, a zatim šalje pažljivo konstruisan okvir koji sadrži array tip sa namerno pogrešnom dužinom ili suvišnim bajtovima. Erlang proces koji opslužuje tu konekciju ulazi u beskonačnu petlju samo na osnovu loše kreiranog binarnog ulaza. Slanjem više ovakvih konekcija paralelno može da se iscrpi thread pool brokera. Primer nekog malicioznog paketa koji ima dodatan input je:
+    ```
+    Bin = <<83,16,192,85,10,177,0,0,0,1,48,161,12,114,97,98,98,105,116, 109,113,45,98,111,120,112,255,255,0,0,96,0,50,112,0,0,19,136,163,5,101,110,45,85,83,224,14,2,65,5,102,105,45,70,73,5,101,110,45,85,83,64,64,193,24,2,163,20,68,69,70,69,78,83,73,67,83, 46,84,69,83,84,46,83,85,73,84,69,65>>
+    ```
 
 - #### Brisanje redova
     CVE-2019-11287
@@ -95,3 +100,5 @@ https://nvd.nist.gov/vuln/detail/CVE-2019-11287
 https://www.rabbitmq.com/docs/http-api-reference
 
 https://github.com/rabbitmq/rabbitmq-java-client/commit/714aae602dcae6cb4b53cadf009323ebac313cc8
+
+https://github.com/rabbitmq/rabbitmq-server/pull/2953/changes/87c9633c39e42e3c9426f1c47ae4c8080fd0b260
