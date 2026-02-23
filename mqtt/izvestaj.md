@@ -45,7 +45,7 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
        ```
        kill -HUP <mosquitto_pid>
        ```
-    - ponovno povezivanje prvog klijenta i pretplaćivanje na temu „a/a“. Broker će isporučiti retained poruku koju je sačuvao u koraku 4, iako izvorni publisher više nema pravo pisanja na taj topic. 
+    - ponovno povezivanje prvog klijenta i pretplaćivanje na temu „a/a“. Broker će isporučiti retained poruku koju je sačuvao u koraku 4, iako izvorni publisher više nema pravo pisanja na taj topic. Ovo krši politiku kontrole pristupa jer nijedan klijent nakon uklanjanja dozvole ne bi trebalo da može da objavi poruku na taj topic.
 
 - #### Prazna ACL politika, podrazumevani allow all
     CVE-2018-12550
@@ -54,7 +54,7 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
     ```
        topic readwrite a/a
     ```
-    Da bi se klijentu uklonila ta permisija, administrator može da zakomentariše taj red. ACL fajl sada sadrži samo komentar, odnosno efektivno je prazan. Očekivano ponašanje bi bilo da klijent više nema pravo pristupa tom fajlu, ali broker tumači prazan ACL fajl kao da ACL uopšte nije definisan i primenjuje podrazumevanu allow-all politiku. Klijent koji se sada konektuje i pretplati na bilo koji topic, uključujući i one koji nikada nisu bili definisani u ACL fajlu, dobija neograničen pristup. Ovo je suprotno nameri administratora koji je hteo da opozove sva prava. Mitigacija za ovaj napad je upgrade na verziju >= 1.5.6 gde prazan ACL fajl rezultuje deny-all politikom, što je bezbednije i intuitivnije ponašanje.
+    Da bi se klijentu uklonila ta permisija, administrator može da zakomentariše taj red. ACL fajl sada sadrži samo komentar, odnosno efektivno je prazan. Očekivano ponašanje bi bilo da klijent više nema pravo pristupa tom topic-u, ali broker tumači prazan ACL fajl kao da ACL uopšte nije definisan i primenjuje podrazumevanu allow-all politiku. Klijent koji se sada konektuje i pretplati na bilo koji topic, uključujući i one koji nikada nisu bili definisani u ACL fajlu, dobija neograničen pristup. Ovo je suprotno nameri administratora koji je hteo da opozove sva prava. Mitigacija za ovaj napad je upgrade na verziju >= 1.5.6 gde prazan ACL fajl rezultuje deny-all politikom, što je bezbednije i intuitivnije ponašanje.
 
 - #### Autentifikacija putem loše kreiranog password fajla
     CVE-2018-12551
