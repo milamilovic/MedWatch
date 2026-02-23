@@ -6,14 +6,15 @@ docker run --rm -v ${PWD}/mitigated/broker:/mosquitto/config eclipse-mosquitto:2
 
 
 docker compose up vulnerable-broker vulnerable-app
+docker compose build attack
 docker compose --profile attack up attack
 docker compose down -v
+docker network prune -f
 docker compose --profile mitigated up mitigated-broker mitigated-app
 onda rucno promeniti u docker compose attack-u 
 
 environment:
     - BROKER_HOST=mitigated-broker
-    - BROKER_PORT=1883
 
 i onda 
 docker compose build attack
