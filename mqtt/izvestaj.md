@@ -19,5 +19,41 @@ Napad eksploatiše ranjivost CVE-2017-7650 u Eclipse Mosquitto brokerima verzije
     Mitigovan sistem se kao i ranjiv sastoji iz Eclipse Mosquitto brokera i aplikacije u Rust-u, ali je broker zamenjen zakrpljenom verzijom 2.0.18 koja eksplicitno validira client_id i username vrednosti pre ACL provere i odbija konekciju svakog klijenta čiji identifikator sadrži karaktere #, + ili /. Pored toga, ACL konfiguracija sadrži eksplicitna deny pravila kao dodatni sloj zaštite. Kada napadač pokuša isti napad, broker vraća NotAuthorized grešku već u fazi uspostavljanja konekcije i napad bude blokiran pre nego što napadač dobije ikakav pristup sistemu.
 
 - #### Video demonstracija
+
+https://github.com/user-attachments/assets/a32ce19d-5d46-44a2-ba5a-10b9c52bd285
+
+
+### Napadi koji nisu realizovani
+Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali su teorijski relevantni za potpunu bezbednosnu analizu sistema. 
+
+- #### Kršenje pristupa retained porukama
+    CVE-2018-12546
+
+    TODO
+
+- #### Prazna ACL politika, podrazumevani allow all
+    CVE-2018-12550
     
-TODO
+    TODO
+
+- #### Autentifikacija putem loše kreiranog password fajla
+    CVE-2018-12551
+    
+    TODO
+
+- #### Subscription bypass za offline durable klijente
+    CVE-2021-34434
+  
+    TODO
+
+
+## Reference
+https://nvd.nist.gov/vuln/detail/cve-2017-7650
+
+https://nvd.nist.gov/vuln/detail/cve-2018-12546
+
+https://nvd.nist.gov/vuln/detail/cve-2018-12550
+
+https://nvd.nist.gov/vuln/detail/cve-2018-12551
+
+https://nvd.nist.gov/vuln/detail/cve-2021-34434
