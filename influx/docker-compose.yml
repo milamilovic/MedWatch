@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  influxdb-vulnerable:
+    image: influxdb:1.8
+    container_name: influxdb-vulnerable
+    profiles: ["vulnerable", "attack"]
+    ports:
+      - "8086:8086"
+    environment:
+      # Autentifikacija isključena (podrazumevana vrednost)
+      - INFLUXDB_HTTP_AUTH_ENABLED=false
+      # Nema TLS enkripcije
+      - INFLUXDB_HTTP_HTTPS_ENABLED=false
+      # Bind na sve interfejse
+      - INFLUXDB_HTTP_BIND_ADDRESS=0.0.0.0:8086
+    volumes:
+      - influxdb_vulnerable_data:/var/lib/influxdb
+    networks:
+      - vulnerable_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  iot-vulnerable:
+    build:
+      context: ./vulnerable
+    container_name: iot-vulnerable
+    profiles: ["vulnerable"]
+    depends_on:
+      influxdb-vulnerable:
+        condition: service_healthy
+    networks:
+      - vulnerable_net
+    restart: unless-stopped
+
+  attacker:
+    build:
+      context: ./attack
+    container_name: influxdb-attacker
+    profiles: ["attack"]
+    environment:
+      - INFLUXDB_URL=influxdb-vulnerable
+    depends_on:
+      influxdb-vulnerable:
+        condition: service_healthy
+    networks:
+      - vulnerable_net
+    restart: "no"
+
+  influxdb-secure:
+    image: influxdb:2.7
+    container_name: influxdb-mitigated
+    profiles: ["mitigated", "attack-mitigated"]
+    ports:
+      - "8087:8086"
+    environment:
+      # MITIGACIJA: Obavezna inicijalizacija sa admin nalogom
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=SuperJakaLozinka2026!
+      - DOCKER_INFLUXDB_INIT_ORG=medwatch
+      - DOCKER_INFLUXDB_INIT_BUCKET=health_monitoring
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=medwatch-super-tajni-token-2026-xyz-123
+    volumes:
+      - influxdb_secure_data:/var/lib/influxdb2
+      - influxdb_secure_config:/etc/influxdb2
+    networks:
+      - secure_net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  iot-mitigated:
+    build:
+      context: ./mitigated
+    container_name: iot-mitigated
+    profiles: ["mitigated"]
+    depends_on:
+      influxdb-secure:
+        condition: service_healthy
+    environment:
+      # MITIGACIJA: Token iz env varijable, nije hardkodovan
+      - INFLUX_TOKEN=medwatch-super-tajni-token-2026-xyz-123
+    networks:
+      - secure_net
+    restart: unless-stopped
+
+  attacker-vs-secure:
+    build:
+      context: ./attack
+    container_name: influxdb-attacker-vs-secure
+    profiles: ["attack-mitigated"]
+    environment:
+      - INFLUXDB_URL=influxdb-secure
+    depends_on:
+      influxdb-secure:
+        condition: service_healthy
+    networks:
+      - secure_net
+    restart: "no"
+
+networks:
+  vulnerable_net:
+    driver: bridge
+  secure_net:
+    driver: bridge
+
+volumes:
+  influxdb_vulnerable_data:
+  influxdb_secure_data:
+  influxdb_secure_config:
