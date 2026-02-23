@@ -50,7 +50,11 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
 - #### Prazna ACL politika, podrazumevani allow all
     CVE-2018-12550
     
-    TODO
+    Ranjivost pogađa Eclipse Mosquitto verzije od 1.0 do 1.5.5. Ako je ACL datoteka prazna ili ima samo prazne redove ili komentare, onda mosquitto tretira ACL datoteku kao da nije definisana, što znači da nikakav pristup nije zabranjen. Iako uskraćivanje pristupa svim temama nije korisna konfiguracija, ovo ponašanje je neočekivano i može dovesti do toga da pristup bude nepravilno odobren u nekim okolnostima. Ova ranjivost se ispoljava tako što na primer klijent ima pravo pristupa topic-u „a/a“, odnosno ACL fajl sadrži 
+    ```
+       topic readwrite a/a
+    ```
+    Da bi se klijentu uklonila ta permisija, administrator može da zakomentariše taj red. ACL fajl sada sadrži samo komentar, odnosno efektivno je prazan. Očekivano ponašanje bi bilo da klijent više nema pravo pristupa tom fajlu, ali broker tumači prazan ACL fajl kao da ACL uopšte nije definisan i primenjuje podrazumevanu allow-all politiku. Klijent koji se sada konektuje i pretplati na bilo koji topic, uključujući i one koji nikada nisu bili definisani u ACL fajlu, dobija neograničen pristup. Ovo je suprotno nameri administratora koji je hteo da opozove sva prava. Mitigacija za ovaj napad je upgrade na verziju >= 1.5.6 gde prazan ACL fajl rezultuje deny-all politikom, što je bezbednije i intuitivnije ponašanje.
 
 - #### Autentifikacija putem loše kreiranog password fajla
     CVE-2018-12551
@@ -77,3 +81,5 @@ https://nvd.nist.gov/vuln/detail/cve-2021-34434
 https://bugs.launchpad.net/ubuntu/+source/mosquitto/+bug/1814931
 
 https://bugs.eclipse.org/bugs/show_bug.cgi?id=543127
+
+https://bugs.eclipse.org/bugs/show_bug.cgi?id=541870
