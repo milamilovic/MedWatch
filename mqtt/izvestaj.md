@@ -84,8 +84,14 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
 - #### Subscription bypass za offline durable klijente
     CVE-2021-34434
   
-    TODO
-
+    Ranjivost pogađa Eclipse Mosquitto verzije od 2.0.0 do 2.0.11 i nastaje u dynamic security pluginu koji je uveden u verziji 2.0 kao moderniji mehanizam za upravljanje korisnicima i dozvolama. U MQTT protokolu, durable klijent je klijent koji se konektuje sa clean_session=false, što znači da broker čuva aktivne subscriptione i neprimljene poruke dok je klijent offline. Ranjivost se ispoljava u situaciji kada administrator oduzme klijentu pravo pretplate na određeni topic dok je taj klijent offline zbog toga što broker ne revokuje postojeće subscriptione za tog klijenta, već ih zadržava u internoj strukturi. Kada se klijent ponovo konektuje, on nastavlja da prima poruke na topicima za koje mu je pristup oduzet, kao da revokacija nikada nije izvršena. Dynamic Security Plugin postavlja acl vrednosti na
+    ```
+    * publishClientSend: deny
+    * publishClientReceive: allow
+    * subscribe: deny
+    * unsubscribe: allow
+    ```
+    Da bi se ova ranjivost demonstrirala, klijent se najpre konektuje na broker sa trajnom sesijom i dovoljno dugim intervalom sesije (`cleanStart=false`, `sessionExpiryInterval=10000`) i pretplaćuje se na topic `message/state`. Zatim se klijent diskonektuje, a administrator u međuvremenu opoziva pravo pretplate putem dynamic security plugina komandom `mosquitto_ctrl dynsec removeClientSubscription <klijent> message/state`. Kada se klijent ponovo konektuje sa `cleanStart=false`, broker restauriše prethodnu sesiju uključujući subscription na `message/state` bez slanja novog SUBSCRIBE paketa. Zbog toga što je podrazumevana vrednost za `publishClientReceive` postavljena na `allow`, klijent i dalje prima poruke sa topica `message/state`, iako mu je pristup formalno oduzet. Mitigacija za ovaj napad je upgrade na verziju >= 2.0.12.
 
 ## Reference
 https://nvd.nist.gov/vuln/detail/cve-2017-7650
@@ -107,3 +113,5 @@ https://bugs.eclipse.org/bugs/show_bug.cgi?id=543401
 https://bugs.launchpad.net/ubuntu/+source/mosquitto/+bug/1814931
 
 https://bugs.eclipse.org/bugs/show_bug.cgi?id=541870
+
+https://bugs.eclipse.org/bugs/show_bug.cgi?id=575324
