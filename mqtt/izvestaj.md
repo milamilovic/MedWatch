@@ -59,7 +59,27 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
 - #### Autentifikacija putem loše kreiranog password fajla
     CVE-2018-12551
     
-    TODO
+    Ranjivost pogađa mosquitto verzije 1.0 do 1.5.5. Kada je broker konfigurisan da koristi password fajl za autentifikaciju, svaki unos pogrešnog oblika u tom fajlu tretira se kao validan. Konkretno, prazna linija u password fajlu tretira se kao validan korisnik sa praznim korisničkim imenom i bez lozinke, što znači da napadač može da se konektuje sa praznim username poljem i bez lozinke. Ova ranjivost nastaje najčešće usled ručnih izmena password fajla, grešaka pri kreiranju backup-a ili neispravnog generisanja fajla automatizovanim skriptama. Ranjivost ne utiče na sisteme gde je password fajl kreiran i modifikovan isključivo putem mosquitto_passwd alata. Da bi se ovaj napad reprodukovao potrebno je jedino konfigurisati /etc/mosquitto.conf fajl:
+    ```
+    password_file /etc/mosquitto/mosquitto.users
+    acl_file /etc/mosquitto/mosquitto.acl
+    allow_anonymous false
+    ```
+    zatim i /etc/mosquitto.acl
+    ```
+    user test
+    readwrite #
+    ```
+    Očekuje se i da postoji fajl mosquitto.users koji sadrži korisnika test sa lozinkom test i prazan red
+    ```
+    test:$6$BHZEmbaA2YgNtNRI$qJ399QBKyrhnzEQCyoL3qU0N8VopPEGZwCjXb8fALz/cFP+ICnJi7cIIIdm3if08qc/0YbI3Ete0md2GqUjG7Q==
+    
+    ```
+    Kada se pokrene mosquitto sa ovom konfiguracijom i pokuša da se pošalje poruka sa praznim username-om komandom 
+    ```
+    mosquitto_pub -d -u '' -t DoorControl -m UNLOCK
+    ```
+    poruka bude uspešno poslata, iako ne bi trebalo. Bez prazne linije u mosquitto.users fajlu se ranjivost ne može demonstrirati. Mitigacija za ovu ranjivost je upgrade na verziju >= 1.5.6, kao i obavezno korišćenje mosquitto_passwd alata za sve izmene password fajla.
 
 - #### Subscription bypass za offline durable klijente
     CVE-2021-34434
@@ -72,14 +92,18 @@ https://nvd.nist.gov/vuln/detail/cve-2017-7650
 
 https://nvd.nist.gov/vuln/detail/cve-2018-12546
 
+https://bugs.eclipse.org/bugs/show_bug.cgi?id=543127
+
 https://nvd.nist.gov/vuln/detail/cve-2018-12550
 
 https://nvd.nist.gov/vuln/detail/cve-2018-12551
 
+https://security.snyk.io/vuln/SNYK-COCOAPODS-MOSQUITTO-470675
+
 https://nvd.nist.gov/vuln/detail/cve-2021-34434
 
-https://bugs.launchpad.net/ubuntu/+source/mosquitto/+bug/1814931
+https://bugs.eclipse.org/bugs/show_bug.cgi?id=543401
 
-https://bugs.eclipse.org/bugs/show_bug.cgi?id=543127
+https://bugs.launchpad.net/ubuntu/+source/mosquitto/+bug/1814931
 
 https://bugs.eclipse.org/bugs/show_bug.cgi?id=541870
