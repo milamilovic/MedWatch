@@ -29,7 +29,23 @@ Preostala četiri napada iz stabla nisu implementirani u praktičnom delu, ali s
 - #### Kršenje pristupa retained porukama
     CVE-2018-12546
 
-    TODO
+    Ranjivost pogađa Eclipse Mosquitto verzije od 1.0 do 1.5.5 uključujući i utiče na integritet podataka. Kada klijent objavi retained poruku odnosno poruku koja se zadržava, a zatim mu se ukine pristup tom topic-u te poruke će i dalje biti objavljene klijentima koji se pretplate na taj topic u budućnosti. Mitigovane verzije mosquitto-a su >= 1.5.6 i uvedena je opcija da se konfiguriše 'check_retain_source' koja ukoliko je podršena proverava prava izvora poruke pre objavljivanja. Koraci za izvođenje ovog napada su:
+    - kreiranje acl fajla sa sledećim sadržajem:
+       ```
+       topic read a/a
+       topic write a/a
+       ```
+    - pokretanje mosquitto brokera koji koristi taj acl fajl
+    - korišćenje MQTT klijenta za pretplatu na poruke iz teme „a/a“
+       ```
+       mosquitto_sub -t 'a/a'
+       ```
+    - korišćenje drugog klijenta da se objavi (retained) poruka na temu „a/a“
+    - brisanje linije „topic write a/a" iz ACL fajla i slanje SIGHUP signala mosquitto-u da bi se ponovo učitala konfiguracija:
+       ```
+       kill -HUP <mosquitto_pid>
+       ```
+    - ponovno povezivanje prvog klijenta i pretplaćivanje na temu „a/a“. Broker će isporučiti retained poruku koju je sačuvao u koraku 4, iako izvorni publisher više nema pravo pisanja na taj topic. 
 
 - #### Prazna ACL politika, podrazumevani allow all
     CVE-2018-12550
@@ -57,3 +73,7 @@ https://nvd.nist.gov/vuln/detail/cve-2018-12550
 https://nvd.nist.gov/vuln/detail/cve-2018-12551
 
 https://nvd.nist.gov/vuln/detail/cve-2021-34434
+
+https://bugs.launchpad.net/ubuntu/+source/mosquitto/+bug/1814931
+
+https://bugs.eclipse.org/bugs/show_bug.cgi?id=543127
