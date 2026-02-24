@@ -5,7 +5,7 @@ Analiziran je sistem za zdravstveni monitoring gde IoT uređaji šalju medicinsk
 
 ## Stablo napada
 
-<img width="6787" height="1196" alt="influxdb-diagram" src="https://github.com/user-attachments/assets/29a4ffb3-9ae7-4231-a9a4-657510486aea" />
+<img width="5133" height="1052" alt="influxdb-diagram" src="https://github.com/user-attachments/assets/88f9091a-8db1-44e6-bff6-72beec34e986" />
 
 ## Praktično realizovan napad
 
