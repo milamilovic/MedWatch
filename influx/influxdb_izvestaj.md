@@ -11,6 +11,10 @@ Analiziran je sistem za zdravstveni monitoring gde IoT uređaji šalju medicinsk
 
 Napad eksploatiše CVE-2019-20933 u InfluxDB verzijama pre 1.7.6 i podrazumevanu konfiguraciju InfluxDB 1.x gde je autentifikacija isključena (`auth-enabled=false`). Sistem koji je implementiran se sastoji iz tri komponente koje su kontejnerizovane i organizovane pomoću docker compose-a. Ovaj napad spada u **CWE-287** (Improper Authentication) i CWE-306 (Missing Authentication for Critical Function) po MITRE terminologiji.
 
+### Video demonstracija
+
+https://github.com/user-attachments/assets/1e4c94a6-2040-4ab7-a550-c4e2e5be82b6
+
 ### Implementacija ranjive aplikacije
 
 Ranjiv sistem se sastoji iz InfluxDB 1.8 instance i aplikacije implementirane u Rust programskom jeziku. InfluxDB je pokrenut sa `INFLUXDB_HTTP_AUTH_ENABLED=false` (podrazumevana vrednost) i bez TLS enkripcije. Aplikacija šalje simulirane medicinske podatke pacijenata (puls, krvni pritisak, temperatura, saturacija kiseonikom) bez ikakve autentifikacije.
